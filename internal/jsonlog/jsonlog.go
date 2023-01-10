@@ -98,6 +98,11 @@ func (l *Logger) PrintFatal(err error, properties map[string]string) {
 	os.Exit(1)
 }
 
+// PrintDebug emits log entries at a Debug level.
+func (l *Logger) PrintDebug(message string, properties map[string]string) {
+	l.print(LevelOff, message, properties)
+}
+
 // Write satisfies the io.Writer interface
 func (l *Logger) Write(message []byte) (n int, err error) {
 	return l.print(LevelError, string(message), nil)

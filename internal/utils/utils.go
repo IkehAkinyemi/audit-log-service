@@ -155,11 +155,11 @@ func ValidateTokenPlaintext(v *Validator, tokenPlaintext string) {
 }
 
 func ValidateAuditEvent(v *Validator, eventLog *model.AuditEvent) {
-	 v.Check(!eventLog.Timestamp.IsZero(), "timestamp", "must be provided")
-	 v.Check(eventLog.Action != "", "action", "must be provided")
-	 v.Check(eventLog.Actor.ID != "", "actor.id", "must be provided")
-	 v.Check(eventLog.Actor.Type != "", "action.type", "must be provided")
-	 v.Check(eventLog.Entity.Type != "", "entity.type", "must be provided")
-	 v.Check(net.ParseIP(eventLog.Context.IPAddr) != nil, "context.ip_address", "not a valid IP address")
-	 v.Check(eventLog.Context.Location != "", "context.location", "must be provided")
+	v.Check(!eventLog.Timestamp.IsZero(), "timestamp", "must be provided")
+	v.Check(eventLog.Action != "", "action", "must be provided")
+	v.Check(eventLog.Actor.ID != "", "actor.id", "must be provided")
+	v.Check(eventLog.Actor.Type != "", "action.type", "must be provided")
+	v.Check(eventLog.Entity.Type != "", "entity.type", "must be provided")
+	v.Check(net.ParseIP(eventLog.Context.IPAddr) != nil, "context.ip_address", "not a valid IP address")
+	v.Check(eventLog.Context.Location != "", "context.location", "must be provided")
 }

@@ -98,10 +98,10 @@ func (svc *service) AddEventLog(w http.ResponseWriter, r *http.Request) {
 
 	eventLog := &model.AuditEvent{
 		Timestamp: input.Timestamp,
-		Action: input.Action,
-		Actor: input.Actor,
-		Entity: input.Entity,
-		Context: input.Context,
+		Action:    input.Action,
+		Actor:     input.Actor,
+		Entity:    input.Entity,
+		Context:   input.Context,
 		Extension: input.Extension,
 	}
 
