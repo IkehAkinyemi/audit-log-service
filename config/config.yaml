@@ -1,0 +1,5 @@
+env: dev # environment 
+mongodb: 
+  connURI: "" # connection string
+port: 8081
+
