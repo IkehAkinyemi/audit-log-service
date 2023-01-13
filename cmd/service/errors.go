@@ -25,7 +25,6 @@ func (svc *service) logDebug(r *http.Request, msg string) {
 		"user_agent":     r.UserAgent(),
 		"HTTP_method":    r.Method,
 		"remote_address": r.RemoteAddr,
-		"service":        string(*svc.contextGetService(r)),
 	})
 }
 

@@ -14,9 +14,9 @@ type Level int8
 
 const (
 	LevelInfo Level = iota
+	LevelDebug
 	LevelError
 	LevelFatal
-	LevelOff
 )
 
 // String returns the severity level
@@ -100,7 +100,7 @@ func (l *Logger) PrintFatal(err error, properties map[string]string) {
 
 // PrintDebug emits log entries at a Debug level.
 func (l *Logger) PrintDebug(message string, properties map[string]string) {
-	l.print(LevelOff, message, properties)
+	l.print(LevelDebug, message, properties)
 }
 
 // Write satisfies the io.Writer interface

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -25,11 +26,16 @@ func (svc *service) healthcheck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// registerService maps to "POST /v1/tokens/register". Saves a service
+// registerService maps to "POST /v1/tokens/register". Registers a service
 // and return API Key for the service.
 func (svc *service) registerService(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		ServiceID string `json:"service_id"`
+	}
+
+	if input.ServiceID == "" {
+		svc.badRequestResponse(w, r, errors.New("service_id must be provided"))
+		return
 	}
 
 	err := utils.ReadJSON(w, r, &input)
@@ -40,7 +46,14 @@ func (svc *service) registerService(w http.ResponseWriter, r *http.Request) {
 
 	token, err := svc.db.NewAPIKey(r.Context(), input.ServiceID)
 	if err != nil {
-		svc.serverErrorResponse(w, r, err)
+		switch {
+		case errors.Is(err, model.ErrDuplicateService):
+			svc.failedValidationResponse(w, r, map[string]string{
+				"servic_id": "a service with serviceID already exists",
+			})
+		default:
+			svc.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 
@@ -80,6 +93,7 @@ func (svc *service) resetToken(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AddEventLog maps to the "POST /v1/audit" endpoint.
 func (svc *service) AddEventLog(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Timestamp time.Time      `json:"created_at"`
@@ -109,12 +123,18 @@ func (svc *service) AddEventLog(w http.ResponseWriter, r *http.Request) {
 
 	if utils.ValidateAuditEvent(v, eventLog); !v.Valid() {
 		svc.failedValidationResponse(w, r, v.Errors)
+		return
 	}
 
-	_, err = svc.db.AddLog(r.Context(), eventLog)
+	id, err := svc.db.AddLog(r.Context(), eventLog)
 	if err != nil {
 		svc.serverErrorResponse(w, r, err)
 		return
+	} else {
+		svc.logger.PrintInfo("log added to DB", map[string]string{
+			"resource_id": fmt.Sprintf("%+v", id),
+			"service":     string(*svc.contextGetService(r)),
+		})
 	}
 
 	err = utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"message": "resource created"}, nil)
