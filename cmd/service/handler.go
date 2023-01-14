@@ -33,14 +33,14 @@ func (svc *service) registerService(w http.ResponseWriter, r *http.Request) {
 		ServiceID string `json:"service_id"`
 	}
 
-	if input.ServiceID == "" {
-		svc.badRequestResponse(w, r, errors.New("service_id must be provided"))
-		return
-	}
-
 	err := utils.ReadJSON(w, r, &input)
 	if err != nil {
 		svc.badRequestResponse(w, r, err)
+		return
+	}
+
+	if input.ServiceID == "" {
+		svc.badRequestResponse(w, r, errors.New("service_id must be provided"))
 		return
 	}
 
@@ -144,12 +144,37 @@ func (svc *service) AddEventLog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// auditTrail maps to "GET /v1/audit-trail?<query_string>". 
+// Retrieves logs based on the query_string values.
 func (svc *service) auditTrail(w http.ResponseWriter, r *http.Request) {
-	// TODO
-	// - Retrieve audit trail based on query string
-}
+	var input utils.Filters
 
-func (svc *service) showEventLog(w http.ResponseWriter, r *http.Request) {
-	// TODO
-	// - Retrieve a log using its uuid
+	v := utils.NewValidator()
+
+	queryStr := r.URL.Query()
+	input.Action = utils.ReadStr(queryStr, "action", "")
+	input.ActorID = utils.ReadStr(queryStr, "actor_id", "")
+	input.ActorType = utils.ReadStr(queryStr, "actor_type", "")
+	input.EntityType = utils.ReadStr(queryStr, "entity_type", "")
+	input.StartTimestamp = utils.ParseTime(queryStr, "start_timestamp")
+	input.EndTimestamp = utils.ParseTime(queryStr, "end_timestamp")
+	input.SortField, input.SortDescending = utils.SortValues(queryStr, "sort")
+	input.Page = utils.ReadInt(queryStr, "page", 1, v)
+	input.PageSize = utils.ReadInt(queryStr, "page_size", 20, v)
+
+	if utils.ValidateFilters(v, input); !v.Valid() {
+		svc.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	logs, metadata, err := svc.db.GetAllLogs(r.Context(), input)
+	if err != nil {
+		svc.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = utils.WriteJSON(w, http.StatusOK, utils.Envelope{"logs": logs, "metadata": metadata}, nil)
+	if err != nil {
+		svc.serverErrorResponse(w, r, err)
+	}
 }

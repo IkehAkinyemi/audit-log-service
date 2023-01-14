@@ -54,7 +54,7 @@ func (r *Repository) NewAPIKey(ctx context.Context, serviceID string) (*model.To
 // AddNewToken adds a new token record to the tokens collection.
 func (r *Repository) AddNewToken(ctx context.Context, token *model.Token) error {
 	collection := r.client.Database(db).Collection(tokensCollection)
-	
+
 	// Lookup service, if it exists.
 	var x model.Token
 	filter := bson.D{{Key: "ServiceID", Value: token.ServiceID}}

@@ -7,8 +7,11 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/IkehAkinyemi/logaudit/internal/repository/model"
 	"gopkg.in/yaml.v2"
@@ -117,6 +120,62 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
 	return nil
 }
 
+// ReadStr reads/parses the query string for a key's value
+func ReadStr(queryStr url.Values, key, defaultValue string) string {
+	str := queryStr.Get(key)
+	if str == "" {
+		return defaultValue
+	}
+	return str
+}
+
+// ParseTime parse the query string for timestamps values.
+func ParseTime(queryStr url.Values, key string) time.Time {
+	value := queryStr.Get(key)
+	if value == "" {
+		return time.Time{}
+	}
+
+	parsedTime, err := time.Parse("2006-01-02T15:04:05Z07:00", value)
+	if err != nil {
+		return time.Time{}
+	}
+
+	return parsedTime
+}
+
+// SortValues retrieve the sort and sort direction values.
+func SortValues(queryStr url.Values, key string) (string, bool) {
+	sortField := queryStr.Get(key)
+	sortDesc := false
+
+	if sortField == "" {
+		return sortField, sortDesc
+	}
+
+	if sortField[0] == '-' {
+		sortDesc = true
+		sortField = sortField[1:]
+	}
+
+	return sortField, sortDesc
+}
+
+// ReadInt parses integer values provided through the query string
+func ReadInt(queryStr url.Values, key string, defaultValue int, v *Validator) int {
+	str := queryStr.Get(key)
+	if str == "" {
+		return defaultValue
+	}
+	intValue, err := strconv.Atoi(str)
+	if err != nil {
+		v.AddError(key, "must be an integer")
+		return defaultValue
+	}
+
+	return intValue
+}
+
 // A Validator defines a custom type for validation.
 type Validator struct {
 	Errors map[string]string
@@ -154,6 +213,7 @@ func ValidateTokenPlaintext(v *Validator, tokenPlaintext string) {
 	v.Check(len(tokenPlaintext) == 26, "key", "must be 26 bytes long")
 }
 
+// ValidateAuditEvent validates each log event submitted.
 func ValidateAuditEvent(v *Validator, eventLog *model.AuditEvent) {
 	v.Check(!eventLog.Timestamp.IsZero(), "timestamp", "must be provided")
 	v.Check(eventLog.Action != "", "action", "must be provided")
@@ -162,4 +222,13 @@ func ValidateAuditEvent(v *Validator, eventLog *model.AuditEvent) {
 	v.Check(eventLog.Entity.Type != "", "entity.type", "must be provided")
 	v.Check(net.ParseIP(eventLog.Context.IPAddr) != nil, "context.ip_address", "not a valid IP address")
 	v.Check(eventLog.Context.Location != "", "context.location", "must be provided")
+}
+
+// ValidateFilters validates the query_string for abnormalities
+func ValidateFilters(v *Validator, f Filters) {
+	v.Check(f.Page > 0, "page", "must be greater than zero")
+	v.Check(f.Page <= 10_000_000, "page", "must be a maximum of 10 million")
+
+	v.Check(f.PageSize > 0, "page_size", "must be greater than zero")
+	v.Check(f.PageSize <= 100, "page_size", "must be a maximum of 100")
 }

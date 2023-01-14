@@ -92,7 +92,7 @@ func main() {
 	service := &service{
 		logger: logger,
 		config: *config,
-		db: mongodb.New(client),
+		db:     mongodb.New(client),
 	}
 
 	err = service.serve()

@@ -20,7 +20,6 @@ func (svc *service) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/audit", svc.requiredAuthenticatedService(svc.auditTrail))
 	router.HandlerFunc(http.MethodPost, "/v1/audit", svc.requiredAuthenticatedService(svc.AddEventLog))
-	router.HandlerFunc(http.MethodGet, "/v1/audit/:id", svc.requiredAuthenticatedService(svc.showEventLog))
 
 	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
 

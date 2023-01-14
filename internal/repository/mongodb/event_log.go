@@ -3,9 +3,10 @@ package mongodb
 import (
 	"context"
 
-	"github.com/IkehAkinyemi/logaudit/internal/repository"
 	"github.com/IkehAkinyemi/logaudit/internal/repository/model"
+	"github.com/IkehAkinyemi/logaudit/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -28,12 +29,16 @@ func New(client *mongo.Client) *Repository {
 func (r *Repository) AddLog(ctx context.Context, eventLog *model.AuditEvent) (any, error) {
 	collection := r.client.Database(db).Collection(eventLogCollection)
 
-	return collection.InsertOne(ctx, *eventLog)
+	if eventLog.ID == primitive.NilObjectID {
+		eventLog.ID = primitive.NewObjectID()
+	}
+
+	return collection.InsertOne(ctx, eventLog)
 }
 
 // GetAggregatedLogs returns all the log records that's matched
 // by the query_string.
-func (r *Repository) GetAggregatedLogs(ctx context.Context, filter repository.Filters) ([]*model.AuditEvent, repository.Metadata, error) {
+func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*model.AuditEvent, utils.Metadata, error) {
 	collection := r.client.Database(db).Collection(eventLogCollection)
 
 	// Set up the pipeline to perform the filtering and pagination.
@@ -77,23 +82,23 @@ func (r *Repository) GetAggregatedLogs(ctx context.Context, filter repository.Fi
 	// Execute the pipeline and retrieve the results.
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, repository.Metadata{}, err
+		return nil, utils.Metadata{}, err
 	}
 
 	var events []*model.AuditEvent
 	err = cursor.All(ctx, &events)
 	if err != nil {
-		return nil, repository.Metadata{}, err
+		return nil, utils.Metadata{}, err
 	}
 
 	// Retrieve the total number of documents that match the filter criteria.
 	count, err := collection.CountDocuments(ctx, bson.M{})
 	if err != nil {
-		return nil, repository.Metadata{}, err
+		return nil, utils.Metadata{}, err
 	}
 
 	// Return the results along with metadata about the pagination.
-	metadata := repository.Metadata{
+	metadata := utils.Metadata{
 		TotalRecords: int(count),
 		CurrentPage:  filter.Page,
 		PageSize:     filter.PageSize,
