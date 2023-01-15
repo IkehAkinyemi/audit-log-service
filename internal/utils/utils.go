@@ -24,6 +24,9 @@ type Config struct {
 	MongoDB struct {
 		ConnURI string `yaml:"connURI"`
 	} `yaml:"mongodb"`
+	MsgBroker struct {
+		ConnURI string `yaml:"connURI"`
+	} `yaml:"amqp"`
 }
 
 // GetConfig read/parse YAML configuration file.
@@ -213,15 +216,15 @@ func ValidateTokenPlaintext(v *Validator, tokenPlaintext string) {
 	v.Check(len(tokenPlaintext) == 26, "key", "must be 26 bytes long")
 }
 
-// ValidateAuditEvent validates each log event submitted.
-func ValidateAuditEvent(v *Validator, eventLog *model.AuditEvent) {
-	v.Check(!eventLog.Timestamp.IsZero(), "timestamp", "must be provided")
-	v.Check(eventLog.Action != "", "action", "must be provided")
-	v.Check(eventLog.Actor.ID != "", "actor.id", "must be provided")
-	v.Check(eventLog.Actor.Type != "", "action.type", "must be provided")
-	v.Check(eventLog.Entity.Type != "", "entity.type", "must be provided")
-	v.Check(net.ParseIP(eventLog.Context.IPAddr) != nil, "context.ip_address", "not a valid IP address")
-	v.Check(eventLog.Context.Location != "", "context.location", "must be provided")
+// ValidateLog validates each log event submitted.
+func ValidateLog(v *Validator, log *model.Log) {
+	v.Check(!log.Timestamp.IsZero(), "timestamp", "must be provided")
+	v.Check(log.Action != "", "action", "must be provided")
+	v.Check(log.Actor.ID != "", "actor.id", "must be provided")
+	v.Check(log.Actor.Type != "", "action.type", "must be provided")
+	v.Check(log.Entity.Type != "", "entity.type", "must be provided")
+	v.Check(net.ParseIP(log.Context.IPAddr) != nil, "context.ip_address", "not a valid IP address")
+	v.Check(log.Context.Location != "", "context.location", "must be provided")
 }
 
 // ValidateFilters validates the query_string for abnormalities

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"expvar"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -19,9 +18,6 @@ func (svc *service) routes() http.Handler {
 	router.HandlerFunc(http.MethodPatch, "/v1/tokens/reset", svc.requiredAuthenticatedService(svc.resetToken))
 
 	router.HandlerFunc(http.MethodGet, "/v1/audit", svc.requiredAuthenticatedService(svc.auditTrail))
-	router.HandlerFunc(http.MethodPost, "/v1/audit", svc.requiredAuthenticatedService(svc.AddEventLog))
 
-	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
-
-	return svc.metrics(svc.recoverPanic(svc.authenticate(router)))
+	return svc.recoverPanic(svc.authenticate(router))
 }

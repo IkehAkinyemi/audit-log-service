@@ -6,9 +6,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// An AuditEvent defines possible fields contained with
+// An Log defines possible fields contained with
 // an event log.
-type AuditEvent struct {
+type Log struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	Timestamp time.Time          `json:"created_at"`
 	Action    string             `json:"action"`

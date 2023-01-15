@@ -2,15 +2,12 @@ package main
 
 import (
 	"errors"
-	"expvar"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/IkehAkinyemi/logaudit/internal/repository/model"
 	"github.com/IkehAkinyemi/logaudit/internal/utils"
-	"github.com/felixge/httpsnoop"
 )
 
 // authenticate does stateful authentication for each service
@@ -83,23 +80,5 @@ func (svc *service) recoverPanic(next http.Handler) http.Handler {
 		}()
 
 		next.ServeHTTP(w, r)
-	})
-}
-
-// metrics measures specific request-response metrics for monitoring.
-func (svc *service) metrics(next http.Handler) http.Handler {
-	totalRequestsReceived := expvar.NewInt("total_requests_received")
-	totalResponsesSent := expvar.NewInt("total_responses_sent")
-	totalProcessingTimeMicroseconds := expvar.NewInt("total_processing_time_μs")
-	totalResponsesSentByStatus := expvar.NewMap("total_responses_sent_by_status")
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		totalRequestsReceived.Add(1)
-
-		metrics := httpsnoop.CaptureMetrics(next, w, r)
-
-		totalResponsesSent.Add(1)
-		totalProcessingTimeMicroseconds.Add(metrics.Duration.Microseconds())
-		totalResponsesSentByStatus.Add(strconv.Itoa(metrics.Code), 1)
 	})
 }

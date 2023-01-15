@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"time"
 
 	"github.com/IkehAkinyemi/logaudit/internal/repository/model"
 	"github.com/IkehAkinyemi/logaudit/internal/utils"
@@ -25,20 +26,23 @@ func New(client *mongo.Client) *Repository {
 	return &Repository{client}
 }
 
-// AddLog adds a log record to the event_log collection.
-func (r *Repository) AddLog(ctx context.Context, eventLog *model.AuditEvent) (any, error) {
+// AddLog adds a log record to the logs collection.
+func (r *Repository) AddLog(log *model.Log) (any, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
 	collection := r.client.Database(db).Collection(eventLogCollection)
 
-	if eventLog.ID == primitive.NilObjectID {
-		eventLog.ID = primitive.NewObjectID()
+	if log.ID == primitive.NilObjectID {
+		log.ID = primitive.NewObjectID()
 	}
 
-	return collection.InsertOne(ctx, eventLog)
+	return collection.InsertOne(ctx, log)
 }
 
 // GetAggregatedLogs returns all the log records that's matched
 // by the query_string.
-func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*model.AuditEvent, utils.Metadata, error) {
+func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*model.Log, utils.Metadata, error) {
 	collection := r.client.Database(db).Collection(eventLogCollection)
 
 	// Set up the pipeline to perform the filtering and pagination.
@@ -85,7 +89,7 @@ func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*m
 		return nil, utils.Metadata{}, err
 	}
 
-	var events []*model.AuditEvent
+	var events []*model.Log
 	err = cursor.All(ctx, &events)
 	if err != nil {
 		return nil, utils.Metadata{}, err

@@ -2,9 +2,7 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/IkehAkinyemi/logaudit/internal/repository/model"
 	"github.com/IkehAkinyemi/logaudit/internal/utils"
@@ -90,57 +88,6 @@ func (svc *service) resetToken(w http.ResponseWriter, r *http.Request) {
 	err = utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"api_key": token}, nil)
 	if err != nil {
 		svc.serverErrorResponse(w, r, err)
-	}
-}
-
-// AddEventLog maps to the "POST /v1/audit" endpoint.
-func (svc *service) AddEventLog(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Timestamp time.Time      `json:"created_at"`
-		Action    string         `json:"action"`
-		Actor     model.Actor    `json:"actor"`
-		Entity    model.Entity   `json:"entity"`
-		Context   model.Context  `json:"context"`
-		Extension map[string]any `json:"extension,omitempty"`
-	}
-
-	err := utils.ReadJSON(w, r, &input)
-	if err != nil {
-		svc.badRequestResponse(w, r, err)
-		return
-	}
-
-	eventLog := &model.AuditEvent{
-		Timestamp: input.Timestamp,
-		Action:    input.Action,
-		Actor:     input.Actor,
-		Entity:    input.Entity,
-		Context:   input.Context,
-		Extension: input.Extension,
-	}
-
-	v := utils.NewValidator()
-
-	if utils.ValidateAuditEvent(v, eventLog); !v.Valid() {
-		svc.failedValidationResponse(w, r, v.Errors)
-		return
-	}
-
-	id, err := svc.db.AddLog(r.Context(), eventLog)
-	if err != nil {
-		svc.serverErrorResponse(w, r, err)
-		return
-	} else {
-		svc.logger.PrintInfo("log added to DB", map[string]string{
-			"resource_id": fmt.Sprintf("%+v", id),
-			"service":     string(*svc.contextGetService(r)),
-		})
-	}
-
-	err = utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"message": "resource created"}, nil)
-	if err != nil {
-		svc.serverErrorResponse(w, r, err)
-		return
 	}
 }
 
