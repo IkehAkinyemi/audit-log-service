@@ -121,9 +121,9 @@ The makefile also includes the `.envrc` file which contains variable that are us
 
 
 ## Future Work
-Add scalability and operational concerns that need to be addressed in the future.
+Added scalability and operational concerns that need to be addressed in the future.
 
-- Added monitoring and logging capabilities to the service to aid in troubleshooting and debugging.
+- Add monitoring and logging capabilities to the service to aid in troubleshooting and debugging.
 - Implement a stronger mechanism for handling and retrying failed event submissions.
 - Implement a mechanism for archiving old events to keep the data storage size manageable.
 - Explore the use of a more robust data storage solution to handle the write-intensive nature of the service and improve performance.
