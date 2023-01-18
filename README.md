@@ -121,12 +121,20 @@ The makefile also includes the `.envrc` file which contains variable that are us
 
 
 ## Future Work
-Added scalability and operational concerns that need to be addressed in the future.
+- Added scalability and operational concerns that need to be addressed in the future.
+  - Add monitoring and logging capabilities to the service to aid in troubleshooting and debugging.
+  - Implement a stronger mechanism for handling and retrying failed event submissions.
+  - Implement a mechanism for archiving old events to keep the data storage size manageable.
+  - Explore the use of a more robust data storage solution to handle the write-intensive nature of the service and improve performance.
+  - Consider implementing a better approach to handle and process large volumes of events in real-time.
 
-- Add monitoring and logging capabilities to the service to aid in troubleshooting and debugging.
-- Implement a stronger mechanism for handling and retrying failed event submissions.
-- Implement a mechanism for archiving old events to keep the data storage size manageable.
-- Explore the use of a more robust data storage solution to handle the write-intensive nature of the service and improve performance.
-- Consider implementing a better approach to handle and process large volumes of events in real-time.
+- Extensive Testing
+  - create and run table-driven unit tests and sub-tests to test cover more test scenarios. 
+  - unit test the HTTP handlers and middleware.
+  - perform ‘end-to-end’ testing of the web service routes, middleware, and handlers.
+  - create mocks of the database models and use them in unit tests.
+  - use a test instance of MongoDB to perform integration tests.
+  - calculate and profile code coverage for the test suite.
+
 
 Click [here](https://docs.google.com/document/d/1lxItFNptU2uRCxcCTuMxFWg_LDO_qJyAJ1RgiSOiaJM/edit?usp=sharing) for more.

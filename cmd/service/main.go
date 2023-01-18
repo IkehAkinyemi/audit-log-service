@@ -20,7 +20,8 @@ import (
 type service struct {
 	logger    *jsonlog.Logger
 	config    utils.Config
-	db        *mongodb.Repository
+	logs      *mongodb.LogRepository
+	tokens    *mongodb.TokenRepository
 	msgBroker *msgBroker
 	wg        sync.WaitGroup
 }
@@ -61,7 +62,8 @@ func main() {
 	service := &service{
 		logger:    logger,
 		config:    *config,
-		db:        mongodb.New(client),
+		logs:      mongodb.NewLogRepository(client),
+		tokens:    mongodb.NewTokenRepository(client),
 		msgBroker: msgBroker,
 	}
 

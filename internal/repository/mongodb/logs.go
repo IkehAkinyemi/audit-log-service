@@ -17,17 +17,17 @@ const (
 )
 
 // Repository defines a Mongodb-based log repository.
-type Repository struct {
+type LogRepository struct {
 	client *mongo.Client
 }
 
 // New instantiates a new Mongodb-based log repository.
-func New(client *mongo.Client) *Repository {
-	return &Repository{client}
+func NewLogRepository(client *mongo.Client) *LogRepository {
+	return &LogRepository{client}
 }
 
 // AddLog adds a log record to the logs collection.
-func (r *Repository) AddLog(log *model.Log) (interface{}, error) {
+func (r *LogRepository) AddLog(log *model.Log) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -42,7 +42,7 @@ func (r *Repository) AddLog(log *model.Log) (interface{}, error) {
 
 // GetAggregatedLogs returns all the log records that's matched
 // by the query_string.
-func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*model.Log, utils.Metadata, error) {
+func (r *LogRepository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*model.Log, utils.Metadata, error) {
 	collection := r.client.Database(db).Collection(eventLogCollection)
 
 	// Set up the pipeline to perform the filtering and pagination.
@@ -89,8 +89,8 @@ func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*m
 		return nil, utils.Metadata{}, err
 	}
 
-	var events []*model.Log
-	err = cursor.All(ctx, &events)
+	var logs []*model.Log
+	err = cursor.All(ctx, &logs)
 	if err != nil {
 		return nil, utils.Metadata{}, err
 	}
@@ -107,5 +107,5 @@ func (r *Repository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*m
 		CurrentPage:  filter.Page,
 		PageSize:     filter.PageSize,
 	}
-	return events, metadata, nil
+	return logs, metadata, nil
 }

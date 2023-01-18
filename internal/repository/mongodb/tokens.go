@@ -17,6 +17,15 @@ var (
 	tokensCollection = "tokens"
 )
 
+type TokenRepository struct {
+	client *mongo.Client
+}
+
+// New instantiates a new Mongodb-based token repository.
+func NewTokenRepository(client *mongo.Client) *TokenRepository {
+	return &TokenRepository{client}
+}
+
 // NewAPIToken cryptographically secure random value
 // for authentication token.
 func generateAPIToken(serviceID string) (*model.Token, error) {
@@ -41,7 +50,7 @@ func generateAPIToken(serviceID string) (*model.Token, error) {
 
 // NewAPIToken generates a new API token, stores to the DB,
 // and returns it to the caller.
-func (r *Repository) NewAPIKey(ctx context.Context, serviceID string) (*model.Token, error) {
+func (r *TokenRepository) NewAPIKey(ctx context.Context, serviceID string) (*model.Token, error) {
 	token, err := generateAPIToken(serviceID)
 	if err != nil {
 		return nil, err
@@ -52,7 +61,7 @@ func (r *Repository) NewAPIKey(ctx context.Context, serviceID string) (*model.To
 }
 
 // AddNewToken adds a new token record to the tokens collection.
-func (r *Repository) AddNewToken(ctx context.Context, token *model.Token) error {
+func (r *TokenRepository) AddNewToken(ctx context.Context, token *model.Token) error {
 	collection := r.client.Database(db).Collection(tokensCollection)
 
 	// Lookup service, if it exists.
@@ -72,7 +81,7 @@ func (r *Repository) AddNewToken(ctx context.Context, token *model.Token) error 
 }
 
 // UpdateToken updates a token; perceived as resetting a token.
-func (r *Repository) UpdateToken(ctx context.Context, serviceID model.ServiceID) (*model.Token, error) {
+func (r *TokenRepository) UpdateToken(ctx context.Context, serviceID model.ServiceID) (*model.Token, error) {
 	token, err := generateAPIToken(string(serviceID))
 	if err != nil {
 		return nil, err
@@ -101,7 +110,7 @@ func (r *Repository) UpdateToken(ctx context.Context, serviceID model.ServiceID)
 }
 
 // GetServiceIDTokenBy retrieves a token by its API key.
-func (r *Repository) GetTokenByAPIKey(ctx context.Context, tokenPlaintext string) (*model.ServiceID, error) {
+func (r *TokenRepository) GetTokenByAPIKey(ctx context.Context, tokenPlaintext string) (*model.ServiceID, error) {
 	tokenHash := sha256.Sum256([]byte(tokenPlaintext))
 	var token model.Token
 

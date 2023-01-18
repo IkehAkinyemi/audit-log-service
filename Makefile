@@ -7,12 +7,16 @@ help:
 	@echo 'Usage:'
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' | sed -e 's/^/ /'
 
-## run/service: run the cmd/service application
+## run/service: run the cmd/service command to start service
 .PHONY: run/service
 run/service:
-	docker-compose up --build
+	docker-compose up --build -d
 
-## run/example: run the cmd/example application to submit a log
+## run/stop: run the cmd/stop command to stop service
+run/stop: 
+	docker-compose down
+
+## run/example: run the cmd/example command to submit a log
 .PHONY: run/example
 run/example:
 	go run ./cmd/example/
@@ -20,4 +24,4 @@ run/example:
 ## test: run the test suite
 .PHONY: test
 test:
-	go test ./... -v
+	go test -race ./... -v

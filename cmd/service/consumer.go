@@ -90,7 +90,7 @@ func (svc *service) processLogs() {
 				continue
 			}
 
-			id, err := svc.db.AddLog(&log)
+			id, err := svc.logs.AddLog(&log)
 			if err != nil {
 				svc.logger.PrintError(err, map[string]string{
 					"type": "failed to write log",

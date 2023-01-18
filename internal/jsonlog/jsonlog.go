@@ -2,6 +2,7 @@ package jsonlog
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"runtime/debug"
@@ -28,6 +29,8 @@ func (l Level) String() string {
 		return "ERROR"
 	case LevelFatal:
 		return "FATAL"
+	case LevelDebug:
+		return "DEBUG"
 	default:
 		return ""
 	}
@@ -67,6 +70,9 @@ func (l *Logger) print(level Level, message string, properties map[string]string
 		Properties: properties,
 	}
 	if level >= LevelError {
+		if level == 1 {
+			fmt.Println("Came here")
+		}
 		aux.Trace = string(debug.Stack())
 	}
 

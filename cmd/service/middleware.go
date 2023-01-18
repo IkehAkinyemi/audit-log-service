@@ -36,7 +36,7 @@ func (svc *service) authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		serviceID, err := svc.db.GetTokenByAPIKey(r.Context(), APIKey)
+		serviceID, err := svc.tokens.GetTokenByAPIKey(r.Context(), APIKey)
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrRecordNotFound):

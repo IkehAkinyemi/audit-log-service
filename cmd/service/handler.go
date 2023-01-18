@@ -42,7 +42,7 @@ func (svc *service) registerService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := svc.db.NewAPIKey(r.Context(), input.ServiceID)
+	token, err := svc.tokens.NewAPIKey(r.Context(), input.ServiceID)
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrDuplicateService):
@@ -78,7 +78,7 @@ func (svc *service) resetToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := svc.db.UpdateToken(r.Context(), model.ServiceID(input.ServiceID))
+	token, err := svc.tokens.UpdateToken(r.Context(), model.ServiceID(input.ServiceID))
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrRecordNotFound):
@@ -121,7 +121,7 @@ func (svc *service) GetLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logs, metadata, err := svc.db.GetAllLogs(r.Context(), input)
+	logs, metadata, err := svc.logs.GetAllLogs(r.Context(), input)
 	if err != nil {
 		svc.serverErrorResponse(w, r, err)
 		return
