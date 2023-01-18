@@ -81,7 +81,7 @@ When a log is submitted to the service, instead of being processed immediately b
 
 This allows the service to handle a large number of logs in asynchronously, improving its overall performance. Additionally, it also allows the service to handle situations where the rate of incoming events exceeds the rate at which the service can process them, by temporarily storing the excess events in the queue. This ensures that the service does not become overwhelmed and can continue to function normally.
 
-This architecture is also fault-tolerant and robust, as the queue acts as a buffer, ensuring that events are not lost even if the service is temporarily unavailable or unable to process them. See [example](./cmd/example/publisher.go) for implementation. See [run/example](#runexample)
+This architecture is also fault-tolerant and robust, as the queue acts as a buffer, ensuring that events are not lost even if the service is temporarily unavailable or unable to process them. See [example](./cmd/example/publisher.go) for implementation. See [run/example](#runexample) for usage.
 
 ## Deployment
 
