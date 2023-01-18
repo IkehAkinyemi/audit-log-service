@@ -6,7 +6,6 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/rabbitmq/amqp091-go v1.5.0
 	go.mongodb.org/mongo-driver v1.11.1
-	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (

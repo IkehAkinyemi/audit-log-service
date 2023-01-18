@@ -28,14 +28,14 @@ func main() {
 	flag.StringVar(&cfgFile, "cfg-file", "", "Directory path to configuration file")
 	flag.Parse()
 
-	config, err := utils.GetConfig(cfgFile)
+	config, err := utils.ParseConfig()
 	if err != nil {
 		logger.PrintFatal(err, nil)
 		return
 	}
 
 	// connect message broker
-	conn, err := amqp.Dial(config.MsgBroker.ConnURI)
+	conn, err := amqp.Dial(config.AMQP_CONN_URI)
 	if err != nil {
 		logger.PrintFatal(err, nil)
 		return
@@ -49,24 +49,24 @@ func main() {
 		return
 	}
 
-	msg := log{
+	msg := &log{
 		Timestamp: time.Now(),
-		Action:    "delete",
+		Action:    "updated",
 		Actor: model.Actor{
 			Type:      "user",
-			ID:        "12345",
+			ID:        "12300",
 			Extension: map[string]any{"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"},
 		},
 		Entity: model.Entity{
-			Type:      "customer",
-			Extension: map[string]any{"name": "John Smith"},
+			Type:      "inventory",
+			Extension: map[string]any{"item_id": "f66020564728"},
 		},
 		Context: model.Context{
 			IPAddr:    "192.168.1.1",
 			Location:  "New York, NY",
-			Extension: map[string]any{"customerID": "98765"},
+			Extension: map[string]any{"inventory_section": "electronics"},
 		},
-		Extension: map[string]any{"notes": "Customer account deleted successfully."},
+		Extension: map[string]any{"notes": "Inventory successfully updated"},
 	}
 
 	if err := msgBroker.PublishLog(msg); err != nil {

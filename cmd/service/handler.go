@@ -47,7 +47,7 @@ func (svc *service) registerService(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, model.ErrDuplicateService):
 			svc.failedValidationResponse(w, r, map[string]string{
-				"servic_id": "a service with serviceID already exists",
+				"message": "a service with serviceID already exists",
 			})
 		default:
 			svc.serverErrorResponse(w, r, err)
@@ -59,6 +59,10 @@ func (svc *service) registerService(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		svc.serverErrorResponse(w, r, err)
 	}
+
+	svc.logger.PrintInfo("New API key generated", map[string]string{
+		"service_id": input.ServiceID,
+	})
 }
 
 // resetToken maps to "PATCH /v1/tokens/reset". Revokes existing API Key
@@ -89,25 +93,28 @@ func (svc *service) resetToken(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		svc.serverErrorResponse(w, r, err)
 	}
+	svc.logger.PrintInfo("API key updated", map[string]string{
+		"service_id": input.ServiceID,
+	})
 }
 
-// auditTrail maps to "GET /v1/audit-trail?<query_string>". 
+// auditTrail maps to "GET /v1/audit-trail?<query_string>".
 // Retrieves logs based on the query_string values.
-func (svc *service) auditTrail(w http.ResponseWriter, r *http.Request) {
+func (svc *service) GetLogs(w http.ResponseWriter, r *http.Request) {
 	var input utils.Filters
 
 	v := utils.NewValidator()
 
-	queryStr := r.URL.Query()
-	input.Action = utils.ReadStr(queryStr, "action", "")
-	input.ActorID = utils.ReadStr(queryStr, "actor_id", "")
-	input.ActorType = utils.ReadStr(queryStr, "actor_type", "")
-	input.EntityType = utils.ReadStr(queryStr, "entity_type", "")
-	input.StartTimestamp = utils.ParseTime(queryStr, "start_timestamp")
-	input.EndTimestamp = utils.ParseTime(queryStr, "end_timestamp")
-	input.SortField, input.SortDescending = utils.SortValues(queryStr, "sort")
-	input.Page = utils.ReadInt(queryStr, "page", 1, v)
-	input.PageSize = utils.ReadInt(queryStr, "page_size", 20, v)
+	query := r.URL.Query()
+	input.Action = utils.ReadStr(query, "action", "")
+	input.ActorID = utils.ReadStr(query, "actor_id", "")
+	input.ActorType = utils.ReadStr(query, "actor_type", "")
+	input.EntityType = utils.ReadStr(query, "entity_type", "")
+	input.StartTimestamp = utils.ParseTime(query, "start_timestamp")
+	input.EndTimestamp = utils.ParseTime(query, "end_timestamp")
+	input.SortField, input.SortDescending = utils.SortValues(query, "sort")
+	input.Page = utils.ReadInt(query, "page", 1, v)
+	input.PageSize = utils.ReadInt(query, "page_size", 20, v)
 
 	if utils.ValidateFilters(v, input); !v.Valid() {
 		svc.failedValidationResponse(w, r, v.Errors)
@@ -124,4 +131,9 @@ func (svc *service) auditTrail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		svc.serverErrorResponse(w, r, err)
 	}
+
+	svc.logger.PrintInfo("Queried for logs", map[string]string{
+		"service_id":   string(*svc.contextGetService(r)),
+		"query_string": r.URL.String(),
+	})
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
 	"os"
 	"sync"
@@ -19,11 +18,59 @@ import (
 
 // Holds the application logic and dependencies
 type service struct {
-	logger *jsonlog.Logger
-	config utils.Config
-	db     *mongodb.Repository
+	logger    *jsonlog.Logger
+	config    utils.Config
+	db        *mongodb.Repository
 	msgBroker *msgBroker
-	wg     sync.WaitGroup
+	wg        sync.WaitGroup
+}
+
+func main() {
+	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
+
+	config, err := utils.ParseConfig()
+	if err != nil {
+		logger.PrintFatal(err, nil)
+		return
+	}
+
+	// connect message broker
+	conn, err := amqp.Dial(config.AMQP_CONN_URI)
+	if err != nil {
+		logger.PrintFatal(err, nil)
+		return
+	}
+	logger.PrintInfo("connection to message broker established", nil)
+	defer conn.Close()
+
+	// connect DB
+	client, err := connectDB(config.DBConnURI)
+	if err != nil {
+		logger.PrintFatal(err, nil)
+		return
+	}
+	logger.PrintInfo("database connection established", nil)
+	defer closeDB(client)
+
+	msgBroker, err := newMsgBroker(conn, "logs")
+	if err != nil {
+		logger.PrintFatal(err, nil)
+		return
+	}
+
+	service := &service{
+		logger:    logger,
+		config:    *config,
+		db:        mongodb.New(client),
+		msgBroker: msgBroker,
+	}
+
+	go service.processLogs()
+
+	err = service.serve()
+	if err != nil {
+		logger.PrintFatal(err, nil)
+	}
 }
 
 // connectDB establishes connection to MongoDB
@@ -56,57 +103,4 @@ func closeDB(client *mongo.Client) {
 	defer cancel()
 
 	client.Disconnect(ctx)
-}
-
-func main() {
-	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
-
-	// Parse flag argument
-	var cfgFile string
-	flag.StringVar(&cfgFile, "cfg-file", "", "Directory path to configuration file")
-	flag.Parse()
-
-	config, err := utils.GetConfig(cfgFile)
-	if err != nil {
-		logger.PrintFatal(err, nil)
-		return
-	}
-
-	// connect message broker
-	conn, err := amqp.Dial(config.MsgBroker.ConnURI)
-	if err != nil {
-		logger.PrintFatal(err, nil)
-		return
-	}
-	logger.PrintInfo("connection to message broker established", nil)
-  defer conn.Close()
-
-	// connect DB
-	client, err := connectDB(config.MongoDB.ConnURI)
-	if err != nil {
-		logger.PrintFatal(err, nil)
-		return
-	}
-	logger.PrintInfo("database connection established", nil)
-	defer closeDB(client)
-
-	msgBroker, err := newMsgBroker(conn, "logs")
-	if err != nil {
-		logger.PrintFatal(err, nil)
-		return
-	}
-
-	service := &service{
-		logger: logger,
-		config: *config,
-		db:     mongodb.New(client),
-		msgBroker: msgBroker,
-	}
-
-	go service.processLogs()
-
-	err = service.serve()
-	if err != nil {
-		logger.PrintFatal(err, nil)
-	}
 }

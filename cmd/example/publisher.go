@@ -9,22 +9,22 @@ import (
 )
 
 type MsgBroker struct {
-	conn *amqp.Connection
+	conn  *amqp.Connection
 	queue string
 }
 
-func newMsgBroker(conn *amqp.Connection, queus string) (*MsgBroker, error) {
-	emitter := &MsgBroker{
-		conn: conn,
-		queue: queus,
+func newMsgBroker(conn *amqp.Connection, queue string) (*MsgBroker, error) {
+	broker := &MsgBroker{
+		conn:  conn,
+		queue: queue,
 	}
 
-	err := emitter.setup()
+	err := broker.setup()
 	if err != nil {
 		return nil, err
 	}
 
-	return emitter, nil
+	return broker, nil
 }
 
 func (a *MsgBroker) setup() error {
@@ -55,7 +55,7 @@ func (a *MsgBroker) setup() error {
 	return err
 }
 
-func (a *MsgBroker) PublishLog(log any) error {
+func (a *MsgBroker) PublishLog(log *log) error {
 	wireData, err := json.Marshal(log)
 	if err != nil {
 		return err

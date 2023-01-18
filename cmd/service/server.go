@@ -15,7 +15,7 @@ import (
 // serve intializes the service's server and spins it up.
 func (svc *service) serve() error {
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", svc.config.Port),
+		Addr:         fmt.Sprintf(":%s", svc.config.Port),
 		Handler:      svc.routes(),
 		ErrorLog:     log.New(svc.logger, "", 0),
 		IdleTimeout:  time.Minute,

@@ -27,8 +27,8 @@ func New(client *mongo.Client) *Repository {
 }
 
 // AddLog adds a log record to the logs collection.
-func (r *Repository) AddLog(log *model.Log) (any, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+func (r *Repository) AddLog(log *model.Log) (interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	collection := r.client.Database(db).Collection(eventLogCollection)

@@ -14,37 +14,43 @@ import (
 	"time"
 
 	"github.com/IkehAkinyemi/logaudit/internal/repository/model"
-	"gopkg.in/yaml.v2"
 )
 
-// Config defines the requirement for CLI configuration.
+// Config defines the requirement for server configuration.
 type Config struct {
-	Env     string `yaml:"env"`
-	Port    int    `yaml:"port"`
-	MongoDB struct {
-		ConnURI string `yaml:"connURI"`
-	} `yaml:"mongodb"`
-	MsgBroker struct {
-		ConnURI string `yaml:"connURI"`
-	} `yaml:"amqp"`
+	Env           string
+	Port          string
+	DBConnURI     string
+	AMQP_CONN_URI string
 }
 
-// GetConfig read/parse YAML configuration file.
-func GetConfig(fileDir string) (*Config, error) {
-	file, err := os.Open(fileDir)
-	if err != nil {
-		return nil, err
+// parseConfig retrieves the environment variables.
+func ParseConfig() (*Config, error) {
+	amqpURI := os.Getenv("AMQP_CONN_URI")
+	if amqpURI == "" {
+		return nil, fmt.Errorf("no provided value for AMQP_CONN_URI")
 	}
-	defer file.Close()
-
-	var cfg Config
-
-	err = yaml.NewDecoder(file).Decode(&cfg)
-	if err != nil {
-		return nil, err
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "dev"
 	}
 
-	return &cfg, nil
+	dbURI := os.Getenv("MONGODB_CONN_URI")
+	if dbURI == "" {
+		return nil, fmt.Errorf("no provided value for MONGODB_CONN_URI")
+	}
+
+	httpPort := os.Getenv("HTTP_PORT")
+	if httpPort == "" {
+		httpPort = "8080"
+	}
+
+	return &Config{
+		Env:           env,
+		Port:          httpPort,
+		DBConnURI:     dbURI,
+		AMQP_CONN_URI: amqpURI,
+	}, nil
 }
 
 // An Envelope wraps the JSON response.

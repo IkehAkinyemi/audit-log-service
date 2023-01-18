@@ -50,6 +50,8 @@ func newMsgBroker(conn *amqp.Connection, queue string) (*msgBroker, error) {
 	return listener, nil
 }
 
+// processLogs receives and process the logs published
+// from different services.
 func (svc *service) processLogs() {
 	channel, err := svc.msgBroker.conn.Channel()
 	if err != nil {
@@ -85,6 +87,7 @@ func (svc *service) processLogs() {
 					"errors": fmt.Sprintf("%+v", v.Errors),
 					"log":    fmt.Sprintf("%+v", log),
 				})
+				continue
 			}
 
 			id, err := svc.db.AddLog(&log)
@@ -93,6 +96,7 @@ func (svc *service) processLogs() {
 					"type": "failed to write log",
 					"log":  fmt.Sprintf("%+v", log),
 				})
+				continue
 			}
 
 			svc.logger.PrintInfo("log added to data store", map[string]string{

@@ -60,7 +60,7 @@ func (svc *service) methodNotAllowed(w http.ResponseWriter, r *http.Request) {
 
 func (svc *service) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
 	msg := err.Error()
-	svc.logDebug(r, "bad request: " + msg)
+	svc.logDebug(r, "bad request: "+msg)
 	svc.errorResponse(w, r, http.StatusBadRequest, msg)
 }
 
