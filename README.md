@@ -53,7 +53,7 @@ The service is a microservice API that takes asychronous and synchronous approac
   - Example:
     - ```curl -i -d "$DATA" -H "Authorization: Key XXXX" http://localhost/v1/tokens/reset```
 
-- Log Querying
+- Query Log 
   - URL: `/v1/logs`
   - Method: **GET**
   - Auth Required: Yes
