@@ -13,5 +13,7 @@ RUN go build -o=/log-service ./cmd/service
 
 EXPOSE 8081
 
+RUN chmod 666 -R /var/
+
 CMD [ "/log-service" ]
 
