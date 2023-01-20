@@ -83,6 +83,11 @@ This allows the service to handle a large number of logs in asynchronously, impr
 
 This architecture is also fault-tolerant and robust, as the queue acts as a buffer, ensuring that events are not lost even if the service is temporarily unavailable or unable to process them. See [example](./cmd/example/publisher.go) for implementation. See [run/example](#runexample) for usage.
 
+## Prerequisites
+- Go version 1.13 or higher
+- Docker and docker-compose
+- make(1) utility
+
 ## Deployment
 
 The makefile included in this project provides several helpful commands to simplify the development and testing process.
