@@ -85,8 +85,8 @@ This architecture is also fault-tolerant and robust, as the queue acts as a buff
 
 ## Prerequisites
 - Go version 1.13 or higher
-- Docker and docker-compose
-- make(1) utility
+- [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04) and [docker-compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04)
+- [make(1)](https://man7.org/linux/man-pages/man1/make.1.html) utility
 
 ## Deployment
 
