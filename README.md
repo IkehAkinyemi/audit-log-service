@@ -57,7 +57,7 @@ The service is a microservice API that takes asychronous and synchronous approac
   - URL: `/v1/logs`
   - Method: **GET**
   - Auth Required: Yes
-  - Data Params: Query parameters containing the field values to filter the events by
+  - Data Params: [Query parameters](./internal/utils/filter.go) containing the field values to filter the log by.
   - Success Response:
     - Code: 200
     - Content: List of logs that match the query
