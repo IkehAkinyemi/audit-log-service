@@ -73,7 +73,7 @@ The service is a microservice API that takes asychronous and synchronous approac
     - Code: 200
     - Content: Service healthe check data
   - Example:
-    - ```curl -i localhost:8081/v1/ping```
+    - ```curl -i http://localhost/v1/ping```
 
 RabbitMQ is used to asynchronously handle log submission in the audit log service. This means that the service can handle a high volume of logs without being blocked by the submission process.
 
