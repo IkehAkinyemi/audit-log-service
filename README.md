@@ -140,4 +140,4 @@ The makefile also includes the `.envrc` file which contains variable that are us
   - calculate and profile code coverage for the test suite.
 
 
-Click [here](https://docs.google.com/document/d/1lxItFNptU2uRCxcCTuMxFWg_LDO_qJyAJ1RgiSOiaJM/edit?usp=sharing) for more.
+Click [here](https://docs.google.com/document/d/1lxItFNptU2uRCxcCTuMxFWg_LDO_qJyAJ1RgiSOiaJM/edit?usp=sharing) for more on the rationale, tradeoffs, and future works.
