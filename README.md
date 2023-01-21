@@ -123,13 +123,15 @@ The makefile also includes the `.envrc` file which contains variable that are us
 
 ## Future Work
 - Added scalability and operational concerns that need to be addressed in the future.
-  - Add monitoring and logging capabilities to the service to aid in troubleshooting and debugging.
-  - Implement a stronger mechanism for handling and retrying failed event submissions.
-  - Implement a mechanism for archiving old events to keep the data storage size manageable.
+  - Add/extend monitoring and observability capabilities to the service to aid troubleshooting and debugging.
+  - Extending RabbitMQ to add a more robust mechanism for handling and retrying failed log submissions and consumption
+  - Implement a mechanism for archiving or deleting old logs to keep the data storage size manageable.
   - Explore the use of a more robust data storage solution to handle the write-intensive nature of the service and improve performance.
-  - Consider implementing a better approach to handle and process large volumes of events in real-time.
+  - Consider implementing a better approach to handling and processing large volumes of real-time logs.
+  - Removing any unnecessary functionalities from the service, like authentication and querying. This allows the service to focus more on the write-ops domain.
 
-- Extensive Testing
+
+- More (extensive) Testing
   - create and run table-driven unit tests and sub-tests to test cover more test scenarios. 
   - unit test the HTTP handlers and middleware.
   - perform ‘end-to-end’ testing of the web service routes, middleware, and handlers.
