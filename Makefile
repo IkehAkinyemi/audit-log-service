@@ -7,7 +7,7 @@ help:
 	@echo 'Usage:'
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' | sed -e 's/^/ /'
 
-## run/service: run the cmd/service command to start service
+## run/service: run the cmd/service command to start service in background
 .PHONY: run/service
 run/service:
 	docker-compose up --build -d
