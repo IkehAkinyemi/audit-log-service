@@ -120,6 +120,17 @@ make test
 ```
 The makefile also includes the `.envrc` file which contains variable that are used in the makefile.
 
+### **Query logs**
+To retrieve stored logs, you will first need to obtain an API Key using the **`/v1/register`** endpoint:
+
+```
+curl -i -d '{"service_id": "platform-12345"}' http://localhost/v1/tokens/register
+```
+Use the returned API key within the Authorization header in the next curl command to query logs like below:
+
+```
+curl -i -H "Authorization: Key <YOUR_API_KEY>" 'http://localhost/v1/logs?action=created&start_timestamp=2022-08-16T12:34:56Z'
+```
 
 ## Future Work
 - Added scalability and operational concerns that need to be addressed in the future.
