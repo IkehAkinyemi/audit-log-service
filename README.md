@@ -86,7 +86,7 @@ This architecture is also fault-tolerant and robust, as the queue acts as a buff
 
 ## Deployment
 
-The makefile included in this project provides several helpful commands to simplify the development and testing process.
+The makefile included in this project provides several helpful commands to simplify the deployment and testing process.
 
 The makefile includes the following commands:
 
