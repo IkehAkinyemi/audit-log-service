@@ -75,7 +75,7 @@ The service is a microservice API that takes asychronous and synchronous approac
   - Example:
     - ```curl -i http://localhost/v1/ping```
 
-RabbitMQ is used to asynchronously handle log submission in the audit log service. This means that the service can handle a high volume of logs without being blocked by the submission process.
+RabbitMQ is used to asynchronously handle log submission in the audit log service, meaning service can handle a high volume of logs without being blocked by the submission process.
 
 This architecture is also fault-tolerant and robust, as the queue acts as a buffer, ensuring that logs are not lost even if the service is temporarily unavailable or unable to process them. See [example](./cmd/example/publisher.go) for implementation. See [run/example](#runexample) for usage.
 

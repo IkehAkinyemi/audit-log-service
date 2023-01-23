@@ -10,7 +10,7 @@ help:
 ## run/service: run the cmd/service command to start service in background
 .PHONY: run/service
 run/service:
-	docker-compose up --build -d
+	docker-compose up --build
 
 ## run/stop: run the cmd/stop command to stop service
 run/stop: 
