@@ -29,7 +29,7 @@ type Log struct {
 See [models](./internal/repository/model/model.go) for more info on the data model.
 
 ## API
-The service is a microservice API that takes asychronous and synchronous approaches to solving the task of receiving, storing and retrieving logs. The API has the following HTTP endpoints:
+The service is a microservice API that takes asynchronous and synchronous approaches to solving the task of receiving, storing and retrieving logs. The API has the following HTTP endpoints:
 
 - Service Registration
   - URL: `/v1/tokens/register`
