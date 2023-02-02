@@ -11,9 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const (
-	db                 = "audit-log"
-	eventLogCollection = "logs"
+var (
+	db            = "audit-log"
+	logCollection = "logs"
 )
 
 // Repository defines a Mongodb-based log repository.
@@ -31,7 +31,7 @@ func (r *LogRepository) AddLog(log *model.Log) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	collection := r.client.Database(db).Collection(eventLogCollection)
+	collection := r.client.Database(db).Collection(logCollection)
 
 	if log.ID == primitive.NilObjectID {
 		log.ID = primitive.NewObjectID()
@@ -43,7 +43,7 @@ func (r *LogRepository) AddLog(log *model.Log) (interface{}, error) {
 // GetAggregatedLogs returns all the log records that's matched
 // by the query_string.
 func (r *LogRepository) GetAllLogs(ctx context.Context, filter utils.Filters) ([]*model.Log, utils.Metadata, error) {
-	collection := r.client.Database(db).Collection(eventLogCollection)
+	collection := r.client.Database(db).Collection(logCollection)
 
 	// Set up the pipeline to perform the filtering and pagination.
 	pipeline := []bson.M{}
