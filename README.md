@@ -1,4 +1,4 @@
-# Audit Log Service
+# Audit Log Service 📻
 
 This service is responsible for recording and querying logs that are sent by other systems. The service provides an Advanced Message Queuing Protocol for submitting logs data and a HTTP endpoint for querying recorded log data by field values.
 
