@@ -118,7 +118,7 @@ Runs the test suite for the service. It uses the `go test` command to run all th
 ```
 make test
 ```
-The makefile also includes the `.envrc` file which contains variable that are used in the makefile.
+The makefile also includes the `.envrc` file which contains variable that are used in the makefile
 
 ### **Query logs**
 To retrieve stored logs, you will first need to obtain an API Key using the **`/v1/register`** endpoint:
